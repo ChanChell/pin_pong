@@ -8,6 +8,18 @@ game = True
 clock = time.Clock()
 FPS = 60
 finish = False
+speed_x = 8
+speed_y = 8
+
+killer = 0
+life = 0
+
+font.init()
+font = font.SysFont('Arial',30)
+
+
+win = font.render('Выиграл первый игрок!', True,(255,0,0))
+lose = font.render('Выиграл второй игрок!', True,(255,0,0))
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, player_x, player_y, player_speed, size_x, size_y):
@@ -36,9 +48,10 @@ class Player2(GameSprite):
         if keys_pressed[K_DOWN] and self.rect.y < 395:
             self.rect.y +=  self.speed
     
-    
+   
 player1 = Player1('platform.png', 10, 100, 10, 30, 110)
 player2 = Player2('platform.png', 960, 100, 10, 30, 110)
+ball = GameSprite('pngwing.com.png', 400, 100, 10, 50, 50)
 
 while game:
     for e in event.get():
@@ -50,6 +63,34 @@ while game:
         player1.reset()
         player2.update()
         player2.reset()
+        ball.reset()
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y
+    
+        if ball.rect.y > 450 or ball.rect.y <0:
+            speed_y *= -1
+        if sprite.collide_rect(player1, ball) or sprite.collide_rect(player2, ball):
+            speed_x *= -1
+        if ball.rect.x > 1000:
+            ball.rect.x = 500
+            ball.rect.y = 250
+            killer = killer + 1
+
+        if ball.rect.x < 0:
+            ball.rect.x = 500
+            ball.rect.y = 250
+            life = life + 1
+        if life >= 5:
+            window.blit(lose,(370,230))
+        if killer >= 5:
+            window.blit(win,(370,230))
+        text_killer = font.render('1-й игрок:' + str(killer), 1, (255,0,0))
+        window.blit(text_killer,(350,0))
+        text_life = font.render('2-й игрок:' + str(life), 1, (78,255,0))
+        window.blit(text_life,(520,0))
+        if life >=5 or killer >= 5:
+            finish = True
+
 
     
 
